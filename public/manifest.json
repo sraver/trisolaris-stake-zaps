@@ -1,21 +1,11 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Wido UniV3",
+  "name": "Wido UniV3",
   "icons": [
     {
-      "src": "favicon.ico",
-      "sizes": "64x64 32x32 24x24 16x16",
-      "type": "image/x-icon"
-    },
-    {
-      "src": "logo192.png",
+      "src": "https://uploads-ssl.webflow.com/61d5b57a99635946134f66aa/61e1704a9ea83332883c783c_wido%20favicon.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "logo512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "32x32"
     }
   ],
   "start_url": ".",
