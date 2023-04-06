@@ -10,11 +10,31 @@ import { Web3Provider } from "@ethersproject/providers";
 
 export const injected = new InjectedConnector({});
 
+function useInput({ type /*...*/, defaultVal }) {
+  const [value, setValue] = useState(defaultVal);
+  const input = (
+    <input
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      type={type}
+    />
+  );
+  return [value, input];
+}
+
 function App() {
   const [fromTokens, setFromTokens] = useState([]);
   const [toTokens, setToTokens] = useState([]);
   const { library, activate, chainId, account } = useWeb3React();
   const [ethProvider, setEthProvider] = useState();
+  const [lowerTick, lowerTickInput] = useInput({
+    type: "number",
+    defaultVal: -24000,
+  });
+  const [upperTick, upperTickInput] = useInput({
+    type: "number",
+    defaultVal: -23000,
+  });
 
   useLocalApi();
 
@@ -90,11 +110,21 @@ function App() {
           quoteApi={async (request) =>
             quote({
               ...request,
-              lowerTick: String(-23000),
-              upperTick: String(-20000),
+              lowerTick,
+              upperTick,
             })
           }
         />
+        <div>
+          <div>
+            <label>Lower Tick</label>
+            {lowerTickInput}
+          </div>
+          <div>
+            <label>Upper Tick</label>
+            {upperTickInput}
+          </div>
+        </div>
       </header>
     </div>
   );
