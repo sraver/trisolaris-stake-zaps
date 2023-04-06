@@ -60,28 +60,11 @@ function App() {
   }, [library, account, chainId, setEthProvider]);
 
   useEffect(() => {
-    const fromTokens = [
-      {
-        chainId: 42161,
-        address: "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE",
-        protocol: "dex",
-        symbol: "ETH",
-        name: "ETH",
-        decimals: 18,
-        logoURI: "https://arbiscan.io/images/main/empty-token.png",
-      },
-      {
-        chainId: 42161,
-        address: "0xfc5A1A6EB076a2C7aD06eD22C90d7E710E35ad0a",
-        protocol: "dex",
-        symbol: "GMX",
-        name: "GMX",
-        decimals: 18,
-        logoURI:
-          "https://tokens.1inch.io/0xfc5a1a6eb076a2c7ad06ed22c90d7e710e35ad0a.png",
-      },
-    ];
     setFromTokens(fromTokens);
+    getSupportedTokens({
+      chainId: [42161],
+      protocol: ["dex", "yearn.finance"],
+    }).then(setFromTokens);
     getSupportedTokens({ chainId: [42161], protocol: ["uni-v3"] }).then(
       setToTokens
     );
