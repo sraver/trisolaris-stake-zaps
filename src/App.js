@@ -2,7 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import { useEffect, useState, useCallback } from "react";
 import { WidoWidget } from "wido-widget";
-import { getSupportedTokens } from "wido";
+import { getSupportedTokens, quote } from "wido";
 import { useLocalApi } from "wido";
 import { useWeb3React } from "@web3-react/core";
 import { InjectedConnector } from "@web3-react/injected-connector";
@@ -87,99 +87,13 @@ function App() {
           ethProvider={ethProvider}
           fromTokens={fromTokens}
           toTokens={toTokens}
-          quoteApi={async (request) => {
-            const endpoint = "quote_v2";
-            const paramsObj = {
-              from_chain_id: String(request.fromChainId),
-              from_token: request.fromToken,
-              to_chain_id: String(request.toChainId),
-              to_token: request.toToken,
-            };
-
-            if (request.slippagePercentage) {
-              paramsObj.slippage_percentage = String(
-                request.slippagePercentage
-              );
-            }
-            if (request.amount) {
-              paramsObj.amount = request.amount;
-            }
-            if (request.user) {
-              paramsObj.user = request.user;
-            }
-            if (request.partner) {
-              paramsObj.partner = request.partner;
-            }
-
-            paramsObj.lower_tick = String(-23000);
-            paramsObj.upper_tick = String(-20000);
-            if (request.tokenId) {
-              paramsObj.token_id = request.tokenId;
-            }
-            if (request.recipient) {
-              paramsObj.recipient = request.recipient;
-            }
-
-            const params = new URLSearchParams(paramsObj);
-            const url = `http://localhost:8080/${endpoint}?${params}`;
-
-            const res = await fetch(url);
-
-            if (!res.ok) {
-              // throw WidoError.from_api_response(await res.json());
-              throw new Error("API error");
-            }
-
-            const body = await res.json();
-            const { is_supported, steps, steps_count } = body;
-
-            const baseQuoteResult = {
-              isSupported: is_supported,
-              steps,
-              stepsCount: steps_count,
-            };
-
-            if (!request.amount && !request.user) {
-              return baseQuoteResult;
-            }
-
-            const {
-              price,
-              min_price,
-              from_token_usd_price,
-              from_token_amount,
-              from_token_amount_usd_value,
-              to_token_usd_price,
-              to_token_amount,
-              to_token_amount_usd_value,
-              expected_slippage,
-              min_to_token_amount,
-              from,
-              to,
-              data,
-              value,
-              messages,
-            } = body;
-
-            return {
-              ...baseQuoteResult,
-              price,
-              minPrice: min_price,
-              fromTokenUsdPrice: from_token_usd_price,
-              fromTokenAmount: from_token_amount,
-              fromTokenAmountUsdValue: from_token_amount_usd_value,
-              toTokenUsdPrice: to_token_usd_price,
-              toTokenAmount: to_token_amount,
-              toTokenAmountUsdValue: to_token_amount_usd_value,
-              expectedSlippage: expected_slippage,
-              minToTokenAmount: min_to_token_amount,
-              from,
-              to,
-              data,
-              value,
-              messages,
-            };
-          }}
+          quoteApi={async (request) =>
+            quote({
+              ...request,
+              lowerTick: String(-23000),
+              upperTick: String(-20000),
+            })
+          }
         />
       </header>
     </div>
