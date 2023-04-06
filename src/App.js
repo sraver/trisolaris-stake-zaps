@@ -36,7 +36,7 @@ function App() {
     defaultVal: -23000,
   });
 
-  useLocalApi();
+  // useLocalApi();
 
   const handleMetamask = useCallback(async () => {
     await activate(injected);
