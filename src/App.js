@@ -1,42 +1,19 @@
-import logo from "./logo.svg";
 import "./App.css";
-import { useEffect, useState, useCallback } from "react";
-import { WidoWidget } from "wido-widget";
-import { getSupportedTokens, quote } from "wido";
-import { useLocalApi } from "wido";
-import { useWeb3React } from "@web3-react/core";
-import { InjectedConnector } from "@web3-react/injected-connector";
-import { Web3Provider } from "@ethersproject/providers";
+import {useEffect, useState, useCallback} from "react";
+import {WidoWidget} from "wido-widget";
+import {getSupportedTokens, quote} from "wido";
+import {useWeb3React} from "@web3-react/core";
+import {InjectedConnector} from "@web3-react/injected-connector";
+import {Web3Provider} from "@ethersproject/providers";
 
 export const injected = new InjectedConnector({});
-
-function useInput({ type /*...*/, defaultVal }) {
-  const [value, setValue] = useState(defaultVal);
-  const input = (
-    <input
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-      type={type}
-    />
-  );
-  return [value, input];
-}
 
 function App() {
   const [fromTokens, setFromTokens] = useState([]);
   const [toTokens, setToTokens] = useState([]);
-  const { library, activate, chainId, account } = useWeb3React();
+  const {library, activate, chainId, account} = useWeb3React();
   const [ethProvider, setEthProvider] = useState();
-  const [lowerTick, lowerTickInput] = useInput({
-    type: "number",
-    defaultVal: -24000,
-  });
-  const [upperTick, upperTickInput] = useInput({
-    type: "number",
-    defaultVal: -23000,
-  });
-
-  // useLocalApi();
+  const [stakingEnabled, setStakingEnabled] = useState(false);
 
   const handleMetamask = useCallback(async () => {
     await activate(injected);
@@ -60,14 +37,12 @@ function App() {
   }, [library, account, chainId, setEthProvider]);
 
   useEffect(() => {
-    setFromTokens(fromTokens);
     getSupportedTokens({
-      chainId: [42161],
-      protocol: ["dex", "yearn.finance"],
-    }).then(setFromTokens);
-    getSupportedTokens({ chainId: [42161], protocol: ["uni-v3"] }).then(
-      setToTokens
-    );
+      chainId: [1313161554],
+    }).then((tokens) => {
+      setFromTokens(tokens);
+      setToTokens(tokens.filter(token => token.protocol === "trisolaris"));
+    });
   }, [setFromTokens, setToTokens]);
 
   return (
@@ -78,22 +53,27 @@ function App() {
           ethProvider={ethProvider}
           fromTokens={fromTokens}
           toTokens={toTokens}
-          quoteApi={async (request) =>
-            quote({
-              ...request,
-              lowerTick,
-              upperTick,
-            })
-          }
+          quoteApi={async (request) => {
+            if (stakingEnabled) {
+              // To enable staking step, an override is set.
+              // `$trisolaris_auto_stake` must be set to 1.
+              //
+              // If the var is not set, or has a different value than 1,
+              //  the staking step won't be added.
+              //
+              // This variable will have no effect on tokens that are not
+              // Trisolaris LP tokens with a valid enabled farm.
+              request.varsOverride = {
+                $trisolaris_auto_stake: "1"
+              }
+            }
+            return quote(request)
+          }}
         />
         <div>
           <div>
-            <label>Lower Tick</label>
-            {lowerTickInput}
-          </div>
-          <div>
-            <label>Upper Tick</label>
-            {upperTickInput}
+            <label>Staking enabled</label>
+            <input type="checkbox" onClick={(e) => {setStakingEnabled(!stakingEnabled)}}/>
           </div>
         </div>
       </header>
