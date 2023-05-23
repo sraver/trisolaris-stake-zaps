@@ -13,7 +13,7 @@
     "react-scripts": "5.0.1",
     "web-vitals": "^3.0.4",
     "wido": "^0.2.7",
-    "wido-widget": "1.0.9"
+    "wido-widget": "1.0.11"
   },
   "scripts": {
     "start": "react-scripts start",
